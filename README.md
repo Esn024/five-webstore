@@ -49,13 +49,13 @@ Server:
 
 The home page shows a variety of products.
 
-![image](screenshots/HomePage.png)
+![image](screenshots/HomePage.jpg)
 
 ## Products
 
 On the products page, it lists out all the products from the server in alphabetical order.
 
-![image](screenshots/ProductsPage.png)
+![image](screenshots/ProductsPage.jpg)
 
 ## Product details
 
