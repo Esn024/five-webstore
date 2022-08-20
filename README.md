@@ -4,7 +4,7 @@
 
 **Five** is an ecommerce group project. The store displays a variety of products that can be added to the cart and purchased.
 
-I was responsible for writing the whole backend as well as the frontend cart functionality, React product details hook, reducer, some component refactoring and some CSS.
+I was responsible for writing the whole backend as well as the frontend cart functionality, React product details hook, reducer, some component refactoring and some CSS. Also, I converted the frontend from JavaScript to TypeScript.
 
 ## Creators
 
@@ -34,6 +34,7 @@ Server:
 - HTML
 - CSS
 - JavaScript
+- TypeScript
 - React
 - NodeJS
 - Express
