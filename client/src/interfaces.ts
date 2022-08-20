@@ -87,13 +87,13 @@ interface IProduct extends ISingleProduct {
   companyId: number;
 }
 
-interface ICartItem extends IServerGetOneItemData {
-  quantity: number; // quantity that is in cart
-}
-
 interface IProductDetails extends IServerGetOneItemData {
   companyName: string;
   companyUrl: string;
+}
+
+interface ICartItem extends IProductDetails {
+  quantity: number; // quantity that is in cart
 }
 
 interface IProviderProps {
