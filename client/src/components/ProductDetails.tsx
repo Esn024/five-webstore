@@ -3,12 +3,12 @@ import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { ShopDataContext } from "./ShopDataContext";
 import { CircularProgress } from "@mui/material";
-import useProductDetails from "../hooks/use-product-details.hook.js";
+import useProductDetails from "../hooks/use-product-details.hook";
 
 const ProductDetails = () => {
   const { dispatch } = useContext(ShopDataContext);
   const { id } = useParams(); /* GET the unique product id for the fetchProductDetails API call */
-  const [productDetails] = useProductDetails(id); /* Return product details from API call */
+  const [productDetails] = useProductDetails(Number(id)); /* Return product details from API call */
 
   return productDetails ? (
     <section className="_50" style={{ height: "100vh" }}>

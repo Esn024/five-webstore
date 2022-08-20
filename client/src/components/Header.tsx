@@ -7,7 +7,7 @@ import { NavLink } from "react-router-dom";
 const Header = () => {
   const { cartItems, getNumItemsInCart } = useContext(ShopDataContext);
 
-  const numItemsInCart = getNumItemsInCart(cartItems);
+  const numItemsInCart = getNumItemsInCart ? getNumItemsInCart(cartItems) : 0;
 
   return (
     <HeaderElement>

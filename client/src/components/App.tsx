@@ -7,10 +7,13 @@ import ResponsiveGrid from "./ResponsiveGrid";
 import GlobalStyle from "../GlobalStyle";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// hack to fix a bug with styled-components' GlobalStyle component
+const GlobalStyleProxy: any = GlobalStyle;
+
 const App = () => {
   return (
     <>
-      <GlobalStyle />
+      <GlobalStyleProxy />
       <BrowserRouter>
           <Header />
           <Routes>

@@ -1,28 +1,29 @@
 import { useState, useEffect } from "react";
+import { IServerGetOneItemResponse, IServerGetOneItemData, IServerGetOneCompanyData, IProductDetails } from '../interfaces';
 
 //custom hook for relevant product details, company name and website
-const useProductDetails = (productId) => {
-  const [productDetails, setProductDetails] = useState(null);
+const useProductDetails = (productId: number) => {
+  const [productDetails, setProductDetails] = useState<IProductDetails | null>(null);
 
   useEffect(() => {
     // fetch company info
-    const fetchCompanyDetails = async (companyID) => {
+    const fetchCompanyDetails = async (companyID: number):Promise<IServerGetOneCompanyData> => {
       const response = await fetch(`/companies/${companyID}`);
       const resJSON = await response.json();
       return resJSON.data;
     };
 
     // fetch product info
-    const fetchProductDetails = async (productId) => {
+    const fetchAndSetProductDetails = async (productId: number):Promise<void> => {
       const response = await fetch(`/items/${productId}`);
-      const resJSON = await response.json();
-      const product = resJSON.data;
+      const resJSON:IServerGetOneItemResponse = await response.json();
+      const product:IServerGetOneItemData = resJSON.data;
 
       // fetch company info for the product
       const company = await fetchCompanyDetails(product.companyId);
 
       // create a new object that adds fields for the company name and company URL
-      const productDetailsObj = {
+      const productDetailsObj: IProductDetails = {
         ...product,
         companyName: company.name,
         companyUrl: company.url,
@@ -32,9 +33,9 @@ const useProductDetails = (productId) => {
       setProductDetails(productDetailsObj);
     };
 
-    // if there is a productId, run the fetchProductDetails function
+    // if there is a productId, run the fetchAndSetProductDetails function
     if (productId) {
-      fetchProductDetails(productId);
+      fetchAndSetProductDetails(productId);
     }
 
     // cleanup
@@ -43,7 +44,7 @@ const useProductDetails = (productId) => {
     };
   }, [productId]);
 
-  return [productDetails, setProductDetails];
+  return [productDetails, setProductDetails] as const;
 };
 
 export default useProductDetails;

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   /* Use srcSet so that the Hero Image is responsive, on mobile phones we load a square Hero image */
-  const HERO_IMG_WIDE = "/assets/hero_image_wide.jpg";
+  const HERO_IMG_WIDE: string = "/assets/hero_image_wide.jpg";
   const navigate = useNavigate();
   return (
     <>

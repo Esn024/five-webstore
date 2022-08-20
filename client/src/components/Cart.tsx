@@ -2,12 +2,14 @@ import React, { useContext } from "react";
 import styled from "styled-components";
 import { ShopDataContext } from "./ShopDataContext";
 
+import { ICartItem, IServerGetOneItemData } from '../interfaces';
+
 const Cart = () => {
   const { cartItems, dispatch, getTotalCostOfCart, handlePurchase } =
     useContext(ShopDataContext);
 
   // calculate total cost of all the cart items
-  const totalCost = getTotalCostOfCart(cartItems);
+  const totalCost: number = getTotalCostOfCart ? getTotalCostOfCart(cartItems) : 0;
 
   return (
     <section className="_66_33 cart__page">
@@ -15,8 +17,8 @@ const Cart = () => {
         <CartH1>YOUR CART</CartH1>
         {cartItems.map((item, key) => {
           // an object of the item info, properly organized to send to dispatch. Find the right object inside cartItems. Pass everything except the "quantity" property
-          let itemForDispatch = { ...item };
-          delete itemForDispatch.quantity;
+          let {quantity, ...itemForDispatch} = { ...item };
+          // delete itemForDispatch.quantity;
 
           return (
             <Card key={key}>
@@ -78,7 +80,7 @@ const Cart = () => {
           <div>Total cost:&nbsp;</div>
           <div>${totalCost.toFixed(2)}</div>
         </TotalCost>
-        <Purchase onClick={() => handlePurchase()}>PURCHASE</Purchase>
+        <Purchase onClick={() => {if (handlePurchase) handlePurchase()}}>PURCHASE</Purchase>
       </div>
     </section>
   );

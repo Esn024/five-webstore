@@ -1,21 +1,36 @@
-import React, { createContext, useReducer } from "react";
+import { createContext, useReducer } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-export const ShopDataContext = createContext();
+import { ISingleProduct, ICartItem, ICartObjForServer, IServerGetOneItemData, IServerBuyItemsResponse, IProviderProps, IProductDetails } from '../interfaces';
+
+
+interface IShopDataContext {
+  cartItems: ICartItem[] | [];
+  dispatch: React.Dispatch<any>;
+  getNumItemsInCart?: (cartItems: ICartItem[]) => number;
+  getTotalCostOfCart?: (cartItems: ICartItem[]) => number;
+  makeCartObjForServer?: (cartItems: ICartItem[]) => ICartObjForServer[];
+  handlePurchase?: () => void;
+}
+
+const defaultShopDataState = {
+  cartItems: [],
+  dispatch: () => null
+}
+
+export const ShopDataContext = createContext<IShopDataContext>(defaultShopDataState);
 
 // the reducer
-const reducer = (cartItems, action) => {
+const reducer = (cartItems:ICartItem[], action:{type: "add-item-to-cart" | "remove-item-from-cart" | "remove-all-of-one-item-from-cart", item: IProductDetails} | {type: "clear-cart"}):ICartItem[] | [] => {
   // make a copy of the existing cart array to modify
   let newCartItemsArr = [...cartItems];
   // if an item is being passed through into reducer, check if the item to be added or removed already exists in the cart array, and if so, find its index
-  const indexOfItem = action.item
-    ? cartItems.findIndex((cartItem) => cartItem._id === action.item._id)
-    : null;
+  const indexOfItem: number = action.type !== "clear-cart" ? cartItems.findIndex((cartItem) => cartItem._id === action.item._id) : -1;
 
   switch (action.type) {
     // try to add one stock of an item to the cart
     case "add-item-to-cart":
-      if (indexOfItem === -1 || indexOfItem === undefined) {
+      if (indexOfItem === -1) {
         // if item is not already in the cart, add it in, with a quantity of 1
         newCartItemsArr.push({ ...action.item, quantity: 1 });
       } else {
@@ -34,12 +49,12 @@ const reducer = (cartItems, action) => {
             newCartItemsArr[indexOfItem].quantity + 1;
         }
       }
+      // console.log({ newCartItemsArr });
       // return the modified cart array
       return newCartItemsArr;
 
     // try to remove one stock of an item from the cart
     case "remove-item-from-cart":
-
       if (indexOfItem === -1) {
         // if item is not already in the cart, you can't remove it, so throw an error
         throw new Error(
@@ -87,12 +102,12 @@ const reducer = (cartItems, action) => {
 };
 
 // context provider
-export const ShopDataProvider = ({ children }) => {
+export const ShopDataProvider = ({ children }:IProviderProps) => {
   // the cart items (kept in state) and dispatch
   const [cartItems, dispatch] = useReducer(reducer, []);
 
   // calculate total number of cart items, tallying up the quantities of each item in cart, or 0 if there are none
-  const getNumItemsInCart = (cartItems) => {
+  const getNumItemsInCart = (cartItems:ICartItem[]):number => {
     return cartItems.length > 0
       ? cartItems
           .map((item) => item.quantity)
@@ -101,25 +116,29 @@ export const ShopDataProvider = ({ children }) => {
   };
 
   // calculate total cost of all the cart items
-  const getTotalCostOfCart = (cartItems) => {
+  const getTotalCostOfCart = (cartItems:ICartItem[]):number => {
     return (
       Math.round(
         cartItems
-          .map((item) => Number((item.price.split("$")[1]).replace(/,/gi, '')) * item.quantity)
+          .map(
+            (item) =>
+              Number(item.price.split("$")[1].replace(/,/gi, "")) *
+              item.quantity
+          )
           .reduce((acc, curr) => acc + curr, 0) * 100
       ) / 100
     );
   };
 
   // create special cart object containing only the information needed to send to server, for the PUT request to /items/buy
-  const makeCartObjForServer = (cartItems) => {
+  const makeCartObjForServer = (cartItems:ICartItem[]):ICartObjForServer[] => {
     return cartItems.map((item) => {
       return { itemId: item._id, quantity: item.quantity };
     });
   };
 
   // purchase items in the cart (send properly-formatted PUT request to items/buy)
-  const handlePurchase = () => {
+  const handlePurchase = ():void => {
     // create special cart object containing only the information needed to send to server
     const cartForServer = makeCartObjForServer(cartItems);
 
@@ -134,9 +153,8 @@ export const ShopDataProvider = ({ children }) => {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((json) => {
-
+      .then((res):Promise<IServerBuyItemsResponse> => res.json())
+      .then((json:IServerBuyItemsResponse) => {
         const { status, message, data } = json;
 
         // check that the request got successfully through to server
@@ -149,7 +167,7 @@ export const ShopDataProvider = ({ children }) => {
           alert(`Successfully purchased items. Your order ID is ${data._id}`);
         } else {
           // if it didn't go through, show an error.
-          throw new Error({ status, message, data });
+          throw new Error(message);
         }
       });
   };

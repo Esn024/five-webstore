@@ -1,8 +1,11 @@
 import React from "react";
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
+import { ISingleProduct } from '../../interfaces';
 
-const SingleProduct = ({ productName, price, img, productId, companyName }) => {
+const SingleProduct = ({ productName, price, img, productId, companyName }: ISingleProduct):JSX.Element => {
+  // console.log({ productName, price, img, productId, companyName });
+
   return (
     <div className="column">
       <Wrapper to={`/items/${productId}`}>
